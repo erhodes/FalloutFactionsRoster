@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">FactionsRoster</string>
+
+    <string name="add_model">Add Model</string>
+
+
+    <string name="crew_list">Crew List</string>
+
+    <string name="back_button">Back</string>
+</resources>
