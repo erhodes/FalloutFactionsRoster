@@ -14,19 +14,23 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.erhodes.factionsroster.CrewViewModel
 import com.erhodes.factionsroster.R
 
 enum class Screens(@StringRes val title: Int) {
-    CrewList(title = R.string.crew_list),
-    AddModel(title = R.string.add_model)
+    CrewDetails(title = R.string.crew_list),
+    AddModel(title = R.string.add_model),
+    SelectLoadout(title = R.string.select_loadout)
 }
 
 /**
@@ -34,7 +38,7 @@ enum class Screens(@StringRes val title: Int) {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CupcakeAppBar(
+fun RosterAppBar(
     currentScreen: Screens,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
@@ -61,22 +65,49 @@ fun CupcakeAppBar(
 
 @Composable
 fun RosterApp(crewViewModel: CrewViewModel = viewModel(), navController: NavHostController = rememberNavController()) {
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentScreen = Screens.valueOf(
+        backStackEntry?.destination?.route ?: Screens.CrewDetails.name
+    )
 
     Scaffold(
+        topBar = {
+            RosterAppBar(
+                currentScreen = currentScreen,
+                canNavigateBack = navController.previousBackStackEntry != null,
+                navigateUp = { navController.navigateUp() }
+            )
+        },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screens.CrewList.name,
+            startDestination = Screens.CrewDetails.name,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            composable(route = Screens.CrewList.name) {
-                CrewListScreen(crewViewModel, {navController.navigate(Screens.AddModel.name)})
+            composable(route = Screens.CrewDetails.name) {
+                val activeCrew = crewViewModel.activeCrewFlow.collectAsState()
+                CrewDetailsScreen(activeCrew.value!!, {navController.navigate(Screens.AddModel.name)})
             }
             composable(route = Screens.AddModel.name) {
-                AddModelScreen(activeCrew = crewViewModel.activeCrew.value!!)
+                val activeCrew = crewViewModel.activeCrewFlow.collectAsState()
+                AddModelScreen(
+                    activeCrew = activeCrew.value!!,
+                    {
+                        crewViewModel.selectedModelClass = it
+                        navController.navigate(Screens.SelectLoadout.name)
+                    }
+                )
+            }
+            composable(route = Screens.SelectLoadout.name) {
+                SelectLoadoutScreen(
+                    modelClass = crewViewModel.selectedModelClass!!,
+                    onLoadoutSelected = {
+                        crewViewModel.addModel(it)
+                        navController.navigate(Screens.CrewDetails.name)
+                    })
             }
         }
     }

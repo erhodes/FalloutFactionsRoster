@@ -3,8 +3,9 @@
 
     <string name="add_model">Add Model</string>
 
+    <string name="select_loadout">Select Loadout</string>
 
-    <string name="crew_list">Crew List</string>
+    <string name="crew_list">Crew Details</string>
 
     <string name="back_button">Back</string>
 </resources>
