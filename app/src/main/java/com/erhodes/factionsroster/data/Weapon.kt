@@ -1,11 +1,11 @@
 package com.erhodes.factionsroster.data
 
 class Weapon(
-    val name: String
+    val name: String,
+    var test: String,
+    var traits: String,
+    var criticalEffect: String
 ) {
-    var test = "3A"
-    var traits = ""
-    var criticalEffect = ""
     var rating = 0
 
 }

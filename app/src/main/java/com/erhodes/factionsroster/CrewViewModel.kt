@@ -10,13 +10,14 @@ import kotlinx.coroutines.flow.StateFlow
 
 class CrewViewModel: ViewModel() {
 
-    private val repository = CrewRepository()
+    private val repository: CrewRepository
+        get() = RosterApplication.crewRepository
 
     var selectedModelClass: ModelClass? = null
     val activeCrewFlow: StateFlow<Crew?> = repository.activeCrewFlow
 
     init {
-        setActiveCrew(CrewRepository.buildDefaults())
+//        setActiveCrew(CrewRepository.buildDefaults())
     }
 
     fun setActiveCrew(crew: Crew) {

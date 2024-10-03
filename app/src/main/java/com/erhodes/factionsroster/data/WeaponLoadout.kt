@@ -6,4 +6,6 @@ package com.erhodes.factionsroster.data
 class WeaponLoadout(
     val weapons: List<Weapon>,
     val rating: Int
-)
+) {
+    constructor(weapon: Weapon, rating: Int) : this(arrayListOf(weapon), rating)
+}
